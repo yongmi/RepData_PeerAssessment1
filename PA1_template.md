@@ -1,14 +1,26 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r, echo=TRUE}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 setwd("~/Documents/Coursera/DataScienceTrack/ReproducibleResearch/Project1")
 
 data <- read.csv("activity.csv", header=TRUE, stringsAsFactors=FALSE)
@@ -17,39 +29,69 @@ data.complete <- data[complete.cases(data),]
 
 ## What is mean total number of steps taken per day?
 Histogram of the total number of steps taken each day
-```{r, echo=TRUE}
+
+```r
 data.perday <- summarise(group_by(data.complete,date), tsteps=sum(steps), meansteps=mean(steps), medsteps=median(steps))
 hist(data.perday$tsteps)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
 Mean total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 mean(data.perday$meansteps)
 ```
+
+```
+## [1] 37.3826
+```
 Median total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 median(data.perday$medsteps)
+```
+
+```
+## [1] 0
 ```
 ## What is the average daily activity pattern?
 Plot of average daily activity pattern
-```{r, echo=TRUE}
+
+```r
 data.interval <- summarise(group_by(data.complete,interval), meansteps=mean(steps))
 plot(data.interval$interval, data.interval$meansteps, type="l")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 5-minute interval, on average across all days in the dataset, containing maximum number of steps:
-```{r, echo=TRUE}
+
+```r
 data.interval[which.max(data.interval$meansteps), "interval"]
+```
+
+```
+## Source: local data frame [1 x 1]
+## 
+##   interval
+## 1      835
 ```
 
 ## Imputing missing values
 Total number of rows with missing values in the dataset:
-```{r, echo=TRUE}
+
+```r
 nrow(data) - nrow(data.complete)
 ```
 
+```
+## [1] 2304
+```
+
 The strategy for filling in missing values in the dataset will be to use the mean for that 5-minute interval, using the following code:
-```{r, echo=TRUE}
+
+```r
 data.imp <- data
 databy.means <- summarise(group_by(data, interval), meansteps=mean(steps, na.rm=TRUE))
 
@@ -61,24 +103,38 @@ for (i in 1:nrow(data.imp)) {
 }
 ```
 Histogram of the total number of steps taken each day
-```{r, echo=TRUE}
+
+```r
 dataimp.perday <- summarise(group_by(data.imp,date), tsteps=sum(steps), meansteps=mean(steps), medsteps=median(steps))
 hist(dataimp.perday$tsteps)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+
 Mean total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 mean(dataimp.perday$meansteps)
 ```
+
+```
+## [1] 37.3826
+```
 Median total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 median(dataimp.perday$medsteps)
+```
+
+```
+## [1] 0
 ```
 
 Notice that missing value imputation using the specified strategy resulted in no difference in the mean and median total number of steps taken per day, compared to the original dataset. The total number of steps did increase in the imputed data set, as can be seen by comparing the histograms for the original dataset and the imputed dataset.
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r, echo=TRUE}
+
+```r
 data.complete$day <-weekdays(as.Date(data.complete$date))
 data.complete$daytype <- ifelse((data.complete$day=="Sunday"), "weekend", "weekday")
 data.complete$daytype <- ifelse((data.complete$day=="Saturday"), "weekend", data.complete$daytype)
@@ -88,3 +144,5 @@ data.daytype <- summarise(group_by(data.complete, daytype, interval), meansteps=
 library(lattice)
 xyplot(data.daytype$meansteps~data$interval|factor(data.daytype$daytype), type="l")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
