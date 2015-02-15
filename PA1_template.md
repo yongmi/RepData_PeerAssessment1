@@ -24,6 +24,7 @@ library(dplyr)
 setwd("~/Documents/Coursera/DataScienceTrack/ReproducibleResearch/Project1")
 
 data <- read.csv("activity.csv", header=TRUE, stringsAsFactors=FALSE)
+data$date <- as.Date(data$date)
 data.complete <- data[complete.cases(data),]
 ```
 
@@ -31,8 +32,9 @@ data.complete <- data[complete.cases(data),]
 Histogram of the total number of steps taken each day
 
 ```r
-data.perday <- summarise(group_by(data.complete,date), tsteps=sum(steps), meansteps=mean(steps), medsteps=median(steps))
-hist(data.perday$tsteps)
+data.perday <- summarise(group_by(data.complete,date), tsteps=sum(steps))
+hist(data.perday$tsteps, xlab="Total number of steps per day",
+     main="")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
@@ -40,27 +42,29 @@ hist(data.perday$tsteps)
 Mean total number of steps taken per day
 
 ```r
-mean(data.perday$meansteps)
+mean(data.perday$tsteps)
 ```
 
 ```
-## [1] 37.3826
+## [1] 10766.19
 ```
 Median total number of steps taken per day
 
 ```r
-median(data.perday$medsteps)
+median(data.perday$tsteps)
 ```
 
 ```
-## [1] 0
+## [1] 10765
 ```
 ## What is the average daily activity pattern?
 Plot of average daily activity pattern
 
 ```r
 data.interval <- summarise(group_by(data.complete,interval), meansteps=mean(steps))
-plot(data.interval$interval, data.interval$meansteps, type="l")
+plot(data.interval$interval, data.interval$meansteps, type="l",
+     xlab="Interval",
+     ylab="Mean number of steps")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
@@ -105,8 +109,9 @@ for (i in 1:nrow(data.imp)) {
 Histogram of the total number of steps taken each day
 
 ```r
-dataimp.perday <- summarise(group_by(data.imp,date), tsteps=sum(steps), meansteps=mean(steps), medsteps=median(steps))
-hist(dataimp.perday$tsteps)
+dataimp.perday <- summarise(group_by(data.imp,date), tsteps=sum(steps))
+hist(dataimp.perday$tsteps, xlab="Total number of steps per day",
+     main="")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
@@ -114,23 +119,23 @@ hist(dataimp.perday$tsteps)
 Mean total number of steps taken per day
 
 ```r
-mean(dataimp.perday$meansteps)
+mean(dataimp.perday$tsteps)
 ```
 
 ```
-## [1] 37.3826
+## [1] 10766.19
 ```
 Median total number of steps taken per day
 
 ```r
-median(dataimp.perday$medsteps)
+median(dataimp.perday$tsteps)
 ```
 
 ```
-## [1] 0
+## [1] 10766.19
 ```
 
-Notice that missing value imputation using the specified strategy resulted in no difference in the mean and median total number of steps taken per day, compared to the original dataset. The total number of steps did increase in the imputed data set, as can be seen by comparing the histograms for the original dataset and the imputed dataset.
+Notice that missing value imputation using the specified strategy resulted in no difference in the mean total number of steps taken per day, compared to the original dataset, but did result in the median value becoming equal to the to the mean value for the imputed dataset. The total number of steps did increase in the imputed data set, as can be seen by comparing the histograms for the original dataset and the imputed dataset.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 

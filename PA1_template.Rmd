@@ -12,35 +12,40 @@ library(dplyr)
 setwd("~/Documents/Coursera/DataScienceTrack/ReproducibleResearch/Project1")
 
 data <- read.csv("activity.csv", header=TRUE, stringsAsFactors=FALSE)
+data$date <- as.Date(data$date)
 data.complete <- data[complete.cases(data),]
 ```
 
 ## What is mean total number of steps taken per day?
 Histogram of the total number of steps taken each day
 ```{r, echo=TRUE}
-data.perday <- summarise(group_by(data.complete,date), tsteps=sum(steps), meansteps=mean(steps), medsteps=median(steps))
-hist(data.perday$tsteps)
+data.perday <- summarise(group_by(data.complete,date), tsteps=sum(steps))
+hist(data.perday$tsteps, xlab="Total number of steps per day",
+     main="")
 ```
 
 Mean total number of steps taken per day
 ```{r, echo=TRUE}
-mean(data.perday$meansteps)
+mean(data.perday$tsteps)
 ```
 Median total number of steps taken per day
 ```{r, echo=TRUE}
-median(data.perday$medsteps)
+median(data.perday$tsteps)
 ```
 ## What is the average daily activity pattern?
 Plot of average daily activity pattern
 ```{r, echo=TRUE}
 data.interval <- summarise(group_by(data.complete,interval), meansteps=mean(steps))
-plot(data.interval$interval, data.interval$meansteps, type="l")
+plot(data.interval$interval, data.interval$meansteps, type="l",
+     xlab="Interval",
+     ylab="Mean number of steps")
 ```
 
 5-minute interval, on average across all days in the dataset, containing maximum number of steps:
 ```{r, echo=TRUE}
 data.interval[which.max(data.interval$meansteps), "interval"]
 ```
+Interval 835, with 206 steps, has the maximum number of steps.
 
 ## Imputing missing values
 Total number of rows with missing values in the dataset:
@@ -62,24 +67,25 @@ for (i in 1:nrow(data.imp)) {
 ```
 Histogram of the total number of steps taken each day
 ```{r, echo=TRUE}
-dataimp.perday <- summarise(group_by(data.imp,date), tsteps=sum(steps), meansteps=mean(steps), medsteps=median(steps))
-hist(dataimp.perday$tsteps)
+dataimp.perday <- summarise(group_by(data.imp,date), tsteps=sum(steps))
+hist(dataimp.perday$tsteps, xlab="Total number of steps per day",
+     main="")
 ```
 
 Mean total number of steps taken per day
 ```{r, echo=TRUE}
-mean(dataimp.perday$meansteps)
+mean(dataimp.perday$tsteps)
 ```
 Median total number of steps taken per day
 ```{r, echo=TRUE}
-median(dataimp.perday$medsteps)
+median(dataimp.perday$tsteps)
 ```
 
-Notice that missing value imputation using the specified strategy resulted in no difference in the mean and median total number of steps taken per day, compared to the original dataset. The total number of steps did increase in the imputed data set, as can be seen by comparing the histograms for the original dataset and the imputed dataset.
+Notice that missing value imputation using the specified strategy resulted in no difference in the mean total number of steps taken per day, compared to the original dataset, but did result in the median value becoming equal to the to the mean value for the imputed dataset. The total number of steps did increase in the imputed data set, as can be seen by comparing the histograms for the original dataset and the imputed dataset.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r, echo=TRUE}
-data.complete$day <-weekdays(as.Date(data.complete$date))
+data.complete$day <-weekdays(data.complete$date)
 data.complete$daytype <- ifelse((data.complete$day=="Sunday"), "weekend", "weekday")
 data.complete$daytype <- ifelse((data.complete$day=="Saturday"), "weekend", data.complete$daytype)
 data.complete$daytype <- factor(data.complete$daytype)
