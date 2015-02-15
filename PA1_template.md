@@ -81,6 +81,7 @@ data.interval[which.max(data.interval$meansteps), "interval"]
 ##   interval
 ## 1      835
 ```
+Interval 835, with 206 steps, has the maximum number of steps.
 
 ## Imputing missing values
 Total number of rows with missing values in the dataset:
@@ -140,14 +141,16 @@ Notice that missing value imputation using the specified strategy resulted in no
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```r
-data.complete$day <-weekdays(as.Date(data.complete$date))
-data.complete$daytype <- ifelse((data.complete$day=="Sunday"), "weekend", "weekday")
-data.complete$daytype <- ifelse((data.complete$day=="Saturday"), "weekend", data.complete$daytype)
-data.complete$daytype <- factor(data.complete$daytype)
-data.daytype <- summarise(group_by(data.complete, daytype, interval), meansteps=mean(steps))
+data.imp$day <-weekdays(data.imp$date)
+data.imp$daytype <- ifelse((data.imp$day=="Sunday"), "weekend", "weekday")
+data.imp$daytype <- ifelse((data.imp$day=="Saturday"), "weekend", data.imp$daytype)
+data.imp$daytype <- factor(data.imp$daytype)
+data.daytype <- summarise(group_by(data.imp, daytype, interval), meansteps=mean(steps))
 
 library(lattice)
-xyplot(data.daytype$meansteps~data$interval|factor(data.daytype$daytype), type="l")
+xyplot(data.daytype$meansteps~data$interval|data.daytype$daytype, type="l",
+       ylab="Number of Steps", xlab="Interval",
+       layout=c(1,2))
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
